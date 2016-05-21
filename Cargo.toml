@@ -1,0 +1,12 @@
+[package]
+name = "cpu_topo"
+version = "0.0.1"
+authors = ["Peter Jin <peterhaijin@gmail.com>"]
+
+[lib]
+name = "cpu_topo"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cpu_topo_tool"
+path = "tools/cpu_topo_tool.rs"
