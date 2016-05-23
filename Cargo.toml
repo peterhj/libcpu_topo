@@ -10,3 +10,6 @@ path = "src/lib.rs"
 [[bin]]
 name = "cpu_topo_tool"
 path = "tools/cpu_topo_tool.rs"
+
+[dependencies]
+libc = { git = "https://github.com/rust-lang/libc.git" }

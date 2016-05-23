@@ -1,13 +1,33 @@
-use std::collections::{HashSet};
+extern crate libc;
+
+use libc::*;
+//use std::collections::{HashSet};
 use std::fs::{File};
-use std::io::{Read, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
+use std::mem::{size_of_val, uninitialized};
 use std::path::{PathBuf};
 //use std::process::{Command};
 
-pub enum CpuLevel {
+/*pub enum CpuLevel {
   Processor,
   Core,
   Thread,
+}*/
+
+#[cfg(target_os = "linux")]
+pub fn set_affinity(thr_idxs: &[usize]) -> Result<(), ()> {
+  unsafe {
+    let mut cpuset = uninitialized();
+    CPU_ZERO(&mut cpuset);
+    for &thr_idx in thr_idxs {
+      CPU_SET(thr_idx, &mut cpuset);
+    }
+    let thread = pthread_self();
+    match pthread_setaffinity_np(thread, size_of_val(&cpuset), &cpuset as *const _) {
+      0 => Ok(()),
+      _ => Err(()),
+    }
+  }
 }
 
 pub enum CpuTopologySource {
@@ -42,7 +62,7 @@ impl CpuTopology {
   fn query_proc_cpuinfo() -> CpuTopology {
     let file = File::open(&PathBuf::from("/proc/cpuinfo"))
       .unwrap();
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
 
     //let mut thread_set = HashSet::new();
     let mut threads = vec![];
